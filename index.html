@@ -566,6 +566,18 @@
         reader.readAsArrayBuffer(file);
       }
     });
+
+    window.addEventListener('DOMContentLoaded', () => {
+  const hash = window.location.hash;
+  if (hash) {
+    const angleFromHash = parseInt(hash.replace('#', ''));
+    if (!isNaN(angleFromHash) && angleFromHash >= -90 && angleFromHash <= 90) {
+      document.getElementById('angleSlider').value = angleFromHash;
+      pasHoekAan(angleFromHash);
+    }
+  }
+});
+
   </script>
 </body>
 </html>

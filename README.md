@@ -1,6 +1,7 @@
 # AngleReader
 
 **AngleReader** is een open source webtool die speciaal ontworpen is om tekst en PDF-documenten te kantelen, gericht op mensen met visuele beperkingen zoals hemianopsie. Door teksten onder een zelfgekozen hoek te presenteren, maakt AngleReader het mogelijk om gemakkelijker te lezen langs het blinde gezichtsveld.
+Alles gebeurt op uw apparaat, dus uw documenten blijven privé en veilig. Niemand anders heeft toegang tot uw bestanden.
 
 ## Functies
 
