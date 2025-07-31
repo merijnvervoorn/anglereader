@@ -9,7 +9,8 @@ Alles gebeurt op uw apparaat, dus uw documenten blijven privé en veilig. Nieman
 - PDF-bestanden uploaden en pagina’s kantelen  
 - Eenvoudige en intuïtieve rotatie-slider  
 - Ondersteuning voor visuele beperkingen zoals hemianopsie  
-- Responsive design voor gebruik op verschillende apparaten  
+- Gebruik een hash om de tool op specifieke graden te openen (keuze uit -90 tot 90 graden) (bijv. [merijnvervoorn.com/anglereader#45](https://www.merijnvervoorn.com/anglereader#45))
+- Volledig client-side, geen server nodig
 
 ## Gebruik
 
