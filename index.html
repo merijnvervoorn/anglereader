@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Rotatie voor tekst</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+      background-color: #f5f5f7;
+      color: #1d1d1f;
+      line-height: 1.47059;
+      font-weight: 400;
+      letter-spacing: -0.022em;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 20px;
+    }
+
+    .hero-section {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+
+    .hero-title {
+      font-size: 48px;
+      font-weight: 600;
+      color: #1d1d1f;
+      margin-bottom: 16px;
+      letter-spacing: -0.003em;
+    }
+
+    .hero-subtitle {
+      font-size: 21px;
+      color: #86868b;
+      font-weight: 400;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .rotation-controls {
+      background: white;
+      border-radius: 18px;
+      padding: 40px;
+      margin-bottom: 60px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .rotation-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1d1d1f;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .slider-label {
+      font-size: 17px;
+      font-weight: 500;
+      color: #1d1d1f;
+    }
+
+    input[type="range"] {
+      width: 280px;
+      height: 4px;
+      border-radius: 2px;
+      background: #d2d2d7;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-track {
+      width: 100%;
+      height: 4px;
+      cursor: pointer;
+      background: #d2d2d7;
+      border-radius: 2px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      height: 28px;
+      width: 28px;
+      border-radius: 50%;
+      background: white;
+      cursor: pointer;
+      -webkit-appearance: none;
+      border: none;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .angle-display {
+      background: #f5f5f7;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 17px;
+      color: #1d1d1f;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 60px;
+    }
+
+    .content-section {
+      background: white;
+      border-radius: 18px;
+      padding: 40px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1d1d1f;
+      margin-bottom: 24px;
+    }
+
+    .section-label {
+      font-size: 17px;
+      font-weight: 500;
+      color: #1d1d1f;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 16px;
+      border: 2px solid #d2d2d7;
+      border-radius: 12px;
+      font-size: 17px;
+      font-family: inherit;
+      resize: vertical;
+      transition: border-color 0.2s ease;
+      background: #fbfbfd;
+      color: #1d1d1f;
+      margin-bottom: 24px;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #007aff;
+      background: white;
+    }
+
+    textarea::placeholder {
+      color: #86868b;
+    }
+
+    .button {
+      background: #007aff;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 980px;
+      font-size: 17px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-block;
+      letter-spacing: -0.022em;
+    }
+
+    .button:hover {
+      background: #0056cc;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+    }
+
+    .button:active {
+      transform: translateY(0);
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      display: block;
+      width: 100%;
+    }
+
+    input[type="file"] {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .file-input-display {
+      display: block;
+      padding: 40px 20px;
+      border: 2px dashed #d2d2d7;
+      border-radius: 12px;
+      text-align: center;
+      background: #fbfbfd;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      margin-bottom: 24px;
+    }
+
+    .file-input-display:hover {
+      border-color: #007aff;
+      background: #f0f8ff;
+    }
+
+    .file-input-text {
+      font-size: 17px;
+      font-weight: 500;
+      color: #1d1d1f;
+      margin-bottom: 4px;
+    }
+
+    .file-input-subtext {
+      font-size: 15px;
+      color: #86868b;
+    }
+
+    .results-section {
+      background: white;
+      border-radius: 18px;
+      padding: 40px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .results-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #1d1d1f;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .scroll-container {
+      width: 100%;
+      height: 800px;
+      overflow: auto;
+      background: #fbfbfd;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .scroll-container::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    .scroll-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .scroll-container::-webkit-scrollbar-thumb {
+      background: #c7c7cc;
+      border-radius: 3px;
+    }
+
+    .scroll-container::-webkit-scrollbar-thumb:hover {
+      background: #aeaeb2;
+    }
+
+    canvas {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+      border-radius: 8px !important;
+      background: white !important;
+      margin: 20px auto !important;
+      display: block !important;
+    }
+
+    .empty-state {
+      color: #86868b;
+      font-size: 17px;
+      padding: 80px 20px;
+      text-align: center;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 32px;
+      }
+      
+      .hero-subtitle {
+        font-size: 19px;
+      }
+      
+      .container {
+        padding: 40px 20px;
+      }
+      
+      .content-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      
+      .rotation-controls,
+      .content-section,
+      .results-section {
+        padding: 24px;
+      }
+      
+      .slider-container {
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      input[type="range"] {
+        width: 100%;
+      }
+      
+      .scroll-container {
+        height: 400px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+      }
+    }
+
+    .button:focus-visible,
+    input[type="range"]:focus-visible,
+    textarea:focus,
+    .file-input-display:focus-within {
+      outline: 2px solid #007aff;
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero-section">
+      <h1 class="hero-title">Tekst en PDF Rotatie</h1>
+      <p class="hero-subtitle">Roteer uw documenten en tekst naar elke gewenste hoek</p>
+    </div>
+
+    <div class="rotation-controls">
+      <h2 class="rotation-title">Rotatie instellen</h2>
+      <div class="slider-container">
+        <span class="slider-label">Hoek:</span>
+        <input type="range" id="angleSlider" min="0" max="360" value="35" oninput="pasHoekAan(this.value)">
+        <div class="angle-display" id="hoekWeergave">35°</div>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <div class="content-section">
+        <h2 class="section-title">Tekst</h2>
+        <label class="section-label" for="textInput">Voer uw tekst in:</label>
+        <textarea id="textInput" placeholder="Typ hier uw tekst..."></textarea>
+        <button class="button" onclick="toonTekst()">Tekst weergeven</button>
+      </div>
+
+      <div class="content-section">
+        <h2 class="section-title">PDF Document</h2>
+        <label class="section-label">Upload uw PDF:</label>
+        <div class="file-input-wrapper">
+          <input type="file" id="pdfUpload" accept="application/pdf">
+          <div class="file-input-display">
+            <div class="file-input-text">PDF selecteren</div>
+            <div class="file-input-subtext">Klik om een bestand te kiezen</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="results-section">
+      <h2 class="results-title">Resultaat</h2>
+      <div class="scroll-container" id="pdfScrollWrapper">
+        <div class="empty-state">Selecteer tekst of upload een PDF om te beginnen</div>
+      </div>
+    </div>
+  </div>
+
+  <footer style="background-color: #f5f5f7; padding: 40px 20px; border-top: 1px solid #e0e0e0; margin-top: 80px;">
+  <div style="max-width: 1100px; margin: 0 auto; text-align: center;">
+    <p style="color: #86868b; font-size: 15px; margin-bottom: 12px;">
+      Gemaakt door Merijn Vervoorn
+    </p>
+    <p style="color: #86868b; font-size: 15px;">
+      Bekijk de broncode op 
+      <a href="https://github.com/merijnvervoorn/anglereader" target="_blank" rel="noopener noreferrer" style="color: #007aff; text-decoration: none;">
+        GitHub
+      </a>. Gelicenseerd onder MIT.
+    </p>
+  </div>
+</footer>
+
+
+  <script>
+    let hoek = 35;
+
+    function toonTekst() {
+      const wrapper = document.getElementById('pdfScrollWrapper');
+      wrapper.innerHTML = '';
+
+      const tekst = document.getElementById('textInput').value.trim();
+      if (!tekst) {
+        wrapper.innerHTML = '<div class="empty-state">Voer eerst tekst in om weer te geven</div>';
+        return;
+      }
+
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+
+      const maxWidth = 800;
+      const lineHeight = 30;
+      const margin = 40;
+
+      context.font = '20px -apple-system, BlinkMacSystemFont, SF Pro Display';
+      context.fillStyle = '#1d1d1f';
+      context.textAlign = 'left';
+      context.textBaseline = 'top';
+
+      const words = tekst.split(/\s+/);
+      const lines = [];
+      let currentLine = '';
+
+      words.forEach(word => {
+        const testLine = currentLine + word + ' ';
+        const { width: testWidth } = context.measureText(testLine);
+        if (testWidth > maxWidth - margin * 2) {
+          lines.push(currentLine);
+          currentLine = word + ' ';
+        } else {
+          currentLine = testLine;
+        }
+      });
+      if (currentLine) lines.push(currentLine);
+
+      const canvasWidth = maxWidth;
+      const canvasHeight = lines.length * lineHeight + margin * 2;
+      const angleRad = hoek * Math.PI / 180;
+      const cos = Math.abs(Math.cos(angleRad));
+      const sin = Math.abs(Math.sin(angleRad));
+      const rotatedWidth = canvasWidth * cos + canvasHeight * sin;
+      const rotatedHeight = canvasWidth * sin + canvasHeight * cos;
+
+      canvas.width = rotatedWidth;
+      canvas.height = rotatedHeight;
+
+      context.font = '20px -apple-system, BlinkMacSystemFont, SF Pro Display';
+      context.fillStyle = '#1d1d1f';
+      context.textAlign = 'left';
+      context.textBaseline = 'top';
+
+      context.translate(rotatedWidth / 2, rotatedHeight / 2);
+      context.rotate(angleRad);
+
+      const offsetX = -canvasWidth / 2 + margin;
+      const offsetY = -canvasHeight / 2 + margin;
+
+      lines.forEach((line, i) => {
+        context.fillText(line, offsetX, offsetY + i * lineHeight);
+      });
+
+      wrapper.appendChild(canvas);
+    }
+
+    function pasHoekAan(waarde) {
+      hoek = parseInt(waarde);
+      document.getElementById('hoekWeergave').innerText = hoek + '°';
+
+      const text = document.getElementById('textInput').value;
+      if (text.trim()) {
+        toonTekst();
+      }
+    }
+
+    document.getElementById('pdfUpload').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file && file.type === "application/pdf") {
+        const wrapper = document.getElementById('pdfScrollWrapper');
+        wrapper.innerHTML = '<div class="empty-state">PDF wordt geladen...</div>';
+
+        document.getElementById('textInput').value = '';
+
+        const reader = new FileReader();
+        reader.onload = function () {
+          const typedarray = new Uint8Array(this.result);
+          pdfjsLib.getDocument(typedarray).promise.then(function (pdf) {
+            wrapper.innerHTML = '';
+
+            async function renderPagesSequentially(pdf, wrapper) {
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const viewport = page.getViewport({ scale: 1.5 });
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+
+    const renderContext = {
+      canvasContext: context,
+      viewport: viewport
+    };
+
+    await page.render(renderContext).promise;
+
+    // Create a wrapper div to handle the rotated canvas
+    const canvasWrapper = document.createElement('div');
+    canvasWrapper.style.position = 'relative';
+    canvasWrapper.style.display = 'flex';
+    canvasWrapper.style.justifyContent = 'center';
+    canvasWrapper.style.alignItems = 'center';
+    canvasWrapper.style.margin = '60px auto';
+    canvasWrapper.style.paddingLeft = '400px'; // of marginLeft
+
+
+    // Calculate rotated height for spacing
+    const angleRad = hoek * Math.PI / 180;
+    const cos = Math.abs(Math.cos(angleRad));
+    const sin = Math.abs(Math.sin(angleRad));
+    const rotatedHeight = viewport.width * sin + viewport.height * cos;
+
+    canvasWrapper.style.height = rotatedHeight + 'px';
+    canvas.style.transform = `rotate(${hoek}deg)`;
+    canvas.style.transformOrigin = 'center';
+
+    canvasWrapper.appendChild(canvas);
+    wrapper.appendChild(canvasWrapper);
+  }
+}
+
+
+            renderPagesSequentially(pdf, wrapper);
+          }).catch(function(error) {
+            wrapper.innerHTML = '<div class="empty-state" style="color: #ff3b30;">Fout bij het laden van de PDF. Probeer een ander bestand.</div>';
+          });
+        };
+        reader.readAsArrayBuffer(file);
+      }
+    });
+  </script>
+</body>
+</html>
